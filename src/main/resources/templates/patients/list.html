@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+<div class="row"><h2>Patient List</h2></div>
+<!--  <th:block th:each="patientsByLastName : ${patientsByLastNames}">-->
+<!--  <form  method="post">-->
+<!--    <input type="search" name="patientsByLastName">-->
+<!--    <input type="submit" class="btn btn-primary" value="Search a patient" th:action="@{/patients/list/{lastName}(lastName=${patientsByLastName.get(0)})}">-->
+<!--  </form>-->
+<!--  </th:block>-->
+<div class="row">
+  <a href="/patients/add" class="btn btn-primary btn-sm">Add New</a>
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>Id</th>
+      <th>Lastname</th>
+      <th>Firstname</th>
+      <th>Birth Date</th>
+      <th>Gender</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="patient : ${patients}">
+      <td style="width: 10%" th:text="${patient.id}"></td>
+      <td th:text="${patient.lastName}"></td>
+      <td th:text="${patient.name}"></td>
+      <td th:text="${patient.birthDate}"></td>
+      <td th:text="${patient.sex}"></td>
+      <td style="width: 20%" class="text-center">
+        <a class="btn btn-warning" th:href="@{/patients/update/{id}(id=${patient.id})}" >Edit</a>
+        <a class="btn btn-danger" th:href="@{/patients/delete/{id}(id=${patient.id})}">Delete</a>
+        <a class="btn btn-info" th:href="@{/patients/info/{id}(id=${patient.id})}">Infos</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+</body>
+</html>
