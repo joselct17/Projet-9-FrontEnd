@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <title>Title</title>
 </head>
@@ -40,14 +41,20 @@
         <th>Phone Number</th>
         <td th:text="${patients.phone}"></td>
     </tr>
-
-    <td style="width: 20%" class="text-center">
-        <a class="btn btn-warning" th:href="@{/patients/update/{id}(id=${patients.id})}" >Edit</a>
-        <a class="btn btn-danger" th:href="@{/patients/delete/{id}(id=${patients.id})}">Delete</a>
-        <a class="btn btn-info" href="/patients/list">List</a>
-    </td>
     </tbody>
 </table>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-warning" th:href="@{/patients/update/{id}(id=${patients.id})}" >Edit</a>
+                <a class="btn btn-danger" th:href="@{/patients/delete/{id}(id=${patients.id})}">Delete</a>
+                <a class="btn btn-info" href="/patients">List</a>
+                <a class="btn btn-success" th:href="@{/patients/info/rapport/{patientId}(patientId=${patients.id})}">Report</a>
+            </div>
+
+        </div>
+    </div>
+
 
 <!--    <div class="row">-->
 <!--        <h3>Patient Notes</h3>-->
@@ -60,6 +67,27 @@
 <!--        </div>-->
 <!--    </div>-->
 
+<!--    <div th:replace="~{notes/notes.html::noteForm}"></div>-->
+
+    <div th:fragment="noteForm" class="container">
+        <h3>Rajouter un commentaire</h3>
+        <form id="notesForm" method="post" th:action="@{/notes/{patientId}(patientId=${patients.id})}">
+            <div class="form-group">
+                <label for="message">Message :</label>
+                <textarea class="form-control" id="message" name="message" rows="5"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Soumettre</button>
+        </form>
+    </div>
+
+    <h4>Notes Médicales</h4>
+    <ul th:each="note : ${notes}" class="list-group">
+        <li th:text="${note.note}" class="list-group-item"></li>
+    </ul>
+
+
+
+<!--    //<div th:replace="~{notes/rapport.html::collapse-report}"></div>-->
 </div>
 </body>
 </html>
