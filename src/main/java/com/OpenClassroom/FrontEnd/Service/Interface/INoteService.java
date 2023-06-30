@@ -6,5 +6,8 @@ import java.util.List;
 
 public interface INoteService {
     List<MedicalNotesEntity> getNotesByPatientId(Integer patientId);
-    MedicalNotesEntity[] getNotesByPatientLastName(String patientName);
+
+    List<MedicalNotesEntity> getAllNotes();
+
+    void createMedicalNoteForPatient(Integer patientId, String message);
 }
