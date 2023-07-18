@@ -9,5 +9,9 @@ public interface INoteService {
 
     List<MedicalNotesEntity> getAllNotes();
 
+    void updateNotes(Integer id, MedicalNotesEntity updatedNote);
+
+    MedicalNotesEntity getNoteById(Integer id);
+
     void createMedicalNoteForPatient(Integer patientId, String message);
 }

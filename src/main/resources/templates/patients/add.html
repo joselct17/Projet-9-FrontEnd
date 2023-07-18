@@ -41,7 +41,7 @@
       <p class="text-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
     </div>
     <input type="hidden" th:field="*{id}">
-    <a class="btn btn-danger btn-sm" href="/patient/list">Cancel</a>
+    <a class="btn btn-danger btn-sm" href="/">Cancel</a>
     <input class="btn btn-primary btn-sm" type="submit" value="Validate Patient">
   </form>
 
