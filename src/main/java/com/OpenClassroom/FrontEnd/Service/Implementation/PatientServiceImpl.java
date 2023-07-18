@@ -13,7 +13,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class PatientServiceImpl implements IPatientsService {
 
-    private final String apiUrl = "http://localhost:8090/api/patients";
+    //private final String apiUrl = "http://localhost:8090/api/patients";
+
+    private final String apiUrl = "http://192.168.1.128:8090/api/patients";
 
     @Autowired
     private final RestTemplate restTemplate;
@@ -24,7 +26,7 @@ public class PatientServiceImpl implements IPatientsService {
 
     @Override
     public PatientEntity patientById(Integer id) {
-        //String apiUrl = "http://localhost:8090/api/patients/{id}";
+
 
         String url = UriComponentsBuilder.fromUriString(apiUrl)
                 .pathSegment(String.valueOf(id))
@@ -50,7 +52,6 @@ public class PatientServiceImpl implements IPatientsService {
     @Override
     public PatientPageDTO getAllPaginatedPatients(int page, int size) {
 
-        //String externalServiceUrl = "http://localhost:8090/api/patients?page=" + page + "&size=" + size;
 
         String url = UriComponentsBuilder.fromUriString(apiUrl)
                 .queryParam("page", page)
@@ -71,7 +72,6 @@ public class PatientServiceImpl implements IPatientsService {
 
     @Override
     public void createPatient(PatientEntity patient) {
-        //String externalServiceUrl = "http://localhost:8090/api/patients";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -84,7 +84,6 @@ public class PatientServiceImpl implements IPatientsService {
     @Override
     public PatientPageDTO getPatientsByLastName(String lastName, int page, int size) {
 
-        //String apiUrl = "http://localhost:8090/api/patients/by-lastName/" + lastName;
 
         String url = UriComponentsBuilder.fromUriString(apiUrl)
                 .pathSegment("by-lastName")

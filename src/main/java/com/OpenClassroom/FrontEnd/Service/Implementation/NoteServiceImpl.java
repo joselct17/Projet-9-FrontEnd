@@ -3,6 +3,8 @@ package com.OpenClassroom.FrontEnd.Service.Implementation;
 import com.OpenClassroom.FrontEnd.Model.MedicalNotesEntity;
 import com.OpenClassroom.FrontEnd.Model.PatientEntity;
 import com.OpenClassroom.FrontEnd.Service.Interface.INoteService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -12,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,7 +22,9 @@ public class NoteServiceImpl implements INoteService {
 
     @Autowired
     RestTemplate restTemplate;
-    private final String apiUrl="http://localhost:9090/api/notes";
+    private final String apiUrl="http://192.168.1.128:9090/api/notes";
+
+    Logger logger = LoggerFactory.getLogger(NoteServiceImpl.class);
 
     @Override
     public List<MedicalNotesEntity> getNotesByPatientId(Integer patientId) {
@@ -46,9 +51,9 @@ public class NoteServiceImpl implements INoteService {
                 .collect(Collectors.toList());
 
         if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
+            return patientNotes;
         } else {
-            throw new RuntimeException("Failed to retrieve medical notes. Status code: " + response.getStatusCodeValue());
+            throw new RuntimeException("Failed to retrieve medical notes. Status code: " + response.getStatusCode().value());
         }
     }
 
@@ -73,11 +78,64 @@ public class NoteServiceImpl implements INoteService {
     }
 
     @Override
+    public void updateNotes(Integer id, MedicalNotesEntity updatedNote) {
+        String externalServiceUrl = "http://192.168.1.128:9090/api/notes/" + id;
+
+        MedicalNotesEntity notes = getNoteById(id);
+
+        Integer patientId = notes.getPatientId();
+
+        updatedNote.setPatientId(notes.getPatientId());
+        updatedNote.setPatientLastName(notes.getPatientLastName());
+        updatedNote.setDateTimeAtCreation(LocalDateTime.now());
+
+        // Créer l'en-tête de la requête
+        HttpEntity<MedicalNotesEntity> requestEntity = new HttpEntity<>(updatedNote);
+
+        // Envoyer la requête PUT
+        restTemplate.exchange(externalServiceUrl, HttpMethod.PUT, requestEntity, Void.class);
+    }
+
+
+    @Override
+    public MedicalNotesEntity getNoteById(Integer id) {
+        logger.debug("getNoteById method starts here, MedicalNoteServiceImpl");
+
+        ResponseEntity<List<MedicalNotesEntity>>response = restTemplate.exchange(
+                apiUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<MedicalNotesEntity>>() {}
+        );
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<MedicalNotesEntity> entities = response.getBody();
+            if (entities != null && !entities.isEmpty()) {
+                Optional<MedicalNotesEntity> matchingEntity = entities.stream()
+                        .filter(entity -> entity.getId().equals(id))
+                        .findFirst();
+                if (matchingEntity.isPresent()) {
+                    return matchingEntity.get();
+                } else {
+                    logger.error("Note with id:{} not found in the database, from MedicalNoteServiceImpl", id);
+                    throw new RuntimeException(String.format("Note with id:%d not found in DB!", id));
+                }
+            } else {
+                logger.error("No entities found in the response, from MedicalNoteServiceImpl");
+                throw new RuntimeException("No entities found in the response!");
+            }
+        } else {
+            throw new RuntimeException("Failed to retrieve entities. Status code: " + response.getStatusCode().value());
+        }
+    }
+
+
+    @Override
     public void createMedicalNoteForPatient(Integer patientId, String message) {
         MedicalNotesEntity medicalNotes = new MedicalNotesEntity();
 
         // Faire une requête à l'API Patient pour récupérer les informations du patient
-        String patientApiUrl = "http://localhost:8090/api/patients/" + patientId;
+        String patientApiUrl = "http://192.168.1.128:8090/api/patients/" + patientId;
         ResponseEntity<PatientEntity> patientResponse = restTemplate.exchange(patientApiUrl, HttpMethod.GET, null, PatientEntity.class);
 
         if (patientResponse.getStatusCode().is2xxSuccessful()) {
@@ -94,7 +152,7 @@ public class NoteServiceImpl implements INoteService {
             throw new RuntimeException("Failed to retrieve patient information. Status code: " + patientResponse.getStatusCode().value());
         }
 
-        String externalServiceUrl = "http://localhost:9090/api/notes";
+        String externalServiceUrl = "http://192.168.1.128:9090/api/notes";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -26,57 +26,89 @@ public class ReportServiceImpl implements IReportService {
 
     @Override
     public ReportEntity getReportByPatientId(Integer patientId) {
-        logger.debug("getReportByPatientId starts here, from ReportServiceImpl");
+        logger.debug("getReportByPatientId commence ici, depuis ReportServiceImpl");
 
+        // Récupère les notes médicales pour l'ID de patient donné
         List<MedicalNotesEntity> medicalNotes = noteService.getNotesByPatientId(patientId);
-        logger.info("Medical notes retrieved for patient with ID: {}", patientId);
+        logger.info("Notes médicales récupérées pour le patient avec l'ID : {}", patientId);
 
-        int noteTriggersCount = countNoteTriggers(medicalNotes);
-        logger.info("Number of note triggers found: {}", noteTriggersCount);
+        // Compte le nombre de déclencheurs de notes dans les notes médicales
 
+        MedicalNotesEntity[] medicalNoes = medicalNotes.toArray(new MedicalNotesEntity[0]);
+        // Convertir la liste 'medicalNotes' en un tableau 'MedicalNotesEntity[]' et le stocker dans 'medicalNoes'
+
+        List<String> notes = Arrays.stream(medicalNoes).map(MedicalNotesEntity::getNote).toList();
+        // Utiliser un flux pour extraire les notes de chaque objet 'MedicalNotesEntity' et créer une nouvelle liste 'notes'
+
+        Long termsTrigger = countTriggerWords(notes);
+        // Appeler la méthode 'countTriggerWords' avec la liste 'notes' et stocker le nombre de déclencheurs de mots dans 'termsTrigger'
+
+        logger.info("Nombre de déclencheurs de notes trouvés : {}", termsTrigger);
+        // Afficher un message d'information indiquant le nombre de déclencheurs de mots trouvés
+
+
+
+        // Récupère le sexe du patient
         String patientGender = patientService.patientById(patientId).getSex();
-        logger.info("Gender retrieved for patient with ID: {}", patientId);
+        logger.info("Sexe récupéré pour le patient avec l'ID : {}", patientId);
 
+        // Calcule l'âge du patient
         int patientAge = calculateAge(patientId);
-        logger.info("Age calculated for patient with ID: {}", patientId);
+        logger.info("Âge calculé pour le patient avec l'ID : {}", patientId);
 
         String riskLevel;
 
-        if (noteTriggersCount == 0) {
-            riskLevel = "None";
-        } else if (noteTriggersCount == 2 && patientAge > 30) {
+        // Détermine le niveau de risque en fonction du nombre de déclencheurs de notes et de l'âge du patient
+        if (termsTrigger == 0) {
+            riskLevel = "none";
+            logger.info("Aucun mot déclencheur trouvé. Niveau de risque : none");
+        } else if (termsTrigger == 2 && patientAge > 30) {
             riskLevel = "Borderline";
+            logger.info("2 mots déclencheurs trouvés et âge du patient > 30 ans. Niveau de risque : Borderline");
         } else if (patientAge < 30) {
-            if (patientGender.equalsIgnoreCase("M") && noteTriggersCount >= 3) {
+            if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 3) {
                 riskLevel = "In Danger";
-            } else if (patientGender.equalsIgnoreCase("F") && noteTriggersCount >= 4) {
+                logger.info("3 mots déclencheurs trouvés, sexe masculin et âge du patient < 30 ans. Niveau de risque : In Danger");
+            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger >= 4) {
                 riskLevel = "In Danger";
-            } else if (patientGender.equalsIgnoreCase("M") && noteTriggersCount >= 5) {
+                logger.info("4 mots déclencheurs trouvés, sexe féminin et âge du patient < 30 ans. Niveau de risque : In Danger");
+            } else if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 5) {
                 riskLevel = "Early onset";
-            } else if (patientGender.equalsIgnoreCase("F") && noteTriggersCount >= 7) {
+                logger.info("5 mots déclencheurs trouvés, sexe masculin et âge du patient < 30 ans. Niveau de risque : Early onset");
+            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger >= 7) {
                 riskLevel = "Early onset";
+                logger.info("7 mots déclencheurs trouvés, sexe féminin et âge du patient < 30 ans. Niveau de risque : Early onset");
             } else {
-                riskLevel = "None";
+                riskLevel = "none";
+                logger.info("Aucun niveau de risque déterminé pour le patient < 30 ans. Niveau de risque : none");
             }
         } else {
-            if (patientGender.equalsIgnoreCase("M") && noteTriggersCount >= 6) {
-                riskLevel = "In Danger";
-            } else if (patientGender.equalsIgnoreCase("F") && noteTriggersCount >= 6) {
-                riskLevel = "In Danger";
-            } else if (patientGender.equalsIgnoreCase("M") && noteTriggersCount >= 8) {
+            if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 6) {
+                riskLevel = "En danger";
+                logger.info("6 mots déclencheurs trouvés, sexe masculin et âge du patient >= 30 ans. Niveau de risque : En danger");
+            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger >= 6) {
+                riskLevel = "En danger";
+                logger.info("6 mots déclencheurs trouvés, sexe féminin et âge du patient >= 30 ans. Niveau de risque : En danger");
+            } else if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 8) {
                 riskLevel = "Early onset";
-            } else if (patientGender.equalsIgnoreCase("F") && noteTriggersCount >= 8) {
+                logger.info("8 mots déclencheurs trouvés, sexe masculin et âge du patient >= 30 ans. Niveau de risque : Early onset");
+            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger >= 8) {
                 riskLevel = "Early onset";
+                logger.info("8 mots déclencheurs trouvés, sexe féminin et âge du patient >= 30 ans. Niveau de risque : Early onset");
             } else {
-                riskLevel = "None";
+                riskLevel = "Unknown";
+                logger.info("Niveau de risque inconnu pour le patient. Niveau de risque : Unknown");
             }
         }
 
+
+        // Récupère le nom du patient
         String patientName = patientService.patientById(patientId).getLastName();
-        logger.info("Patient name retrieved for patient with ID: {}", patientId);
+        logger.info("Nom du patient récupéré pour le patient avec l'ID : {}", patientId);
 
-        logger.debug("getReportByPatientId ends here, from ReportServiceImpl");
+        logger.debug("getReportByPatientId se termine ici, depuis ReportServiceImpl");
 
+        // Retourne une nouvelle entité de rapport avec l'ID du patient, le nom du patient et le niveau de risque
         return new ReportEntity(patientId, patientName, riskLevel);
     }
 
@@ -85,54 +117,57 @@ public class ReportServiceImpl implements IReportService {
         return null;
     }
 
-    private int countNoteTriggers(List<MedicalNotesEntity> medicalNotes) {
-        logger.debug("countNoteTriggers starts here, from ReportServiceImpl");
 
-        int count = 0;
-        for (MedicalNotesEntity note : medicalNotes) {
-            if (noteContainsTriggers(note)) {
-                count++;
-            }
-        }
+    public long countTriggerWords(List<String> comments) {
+        // Début de la méthode 'countTriggerWords'. Message de débogage pour indiquer le début de l'exécution.
+        logger.debug("countTriggerWords commence ici, depuis ReportServiceImpl");
 
-        logger.debug("countNoteTriggers ends here, from ReportServiceImpl");
 
+        // Liste des mots déclencheurs à rechercher dans les commentaires.
+        List<String> triggerWords = Arrays.asList(
+                "hémoglobine a1c", "microalbumine", "taille", "poids", "fumeur", "anormal", "cholestérol", "vertige", "rechute", "réaction", "anticorps", "fume");
+
+        long count = comments.stream()
+                // Convertit tous les commentaires en minuscules pour une recherche insensible à la casse.
+                .map(String::toLowerCase)
+                // Applique un filtre pour rechercher les mots déclencheurs dans chaque commentaire.
+                .flatMap(comment -> triggerWords.stream().filter(comment::contains))
+                // Supprime les doublons pour ne compter chaque mot déclencheur qu'une seule fois.
+                .distinct()
+                .peek(System.out::println)
+                // Compte le nombre total de mots déclencheurs trouvés dans tous les commentaires.
+                .count();
+
+        // Affiche le nombre total de mots déclencheurs (facultatif).
+        System.out.println("Le nombre des mots déclencheurs est: " + count);
+
+        // Message d'information pour indiquer que la méthode 'countTriggerWords' a été appelée avec succès et le nombre de mots déclencheurs calculé.
+        logger.info("countTriggerWords a été appelée avec succès et a calculé le nombre de mots déclencheurs : {}, depuis ReportServiceImpl", count);
+
+        // Retourne le nombre total de mots déclencheurs.
         return count;
+
     }
 
-    private boolean noteContainsTriggers(MedicalNotesEntity note) {
-        logger.debug("noteContainsTriggers starts here, from ReportServiceImpl");
 
-        List<String> triggers = Arrays.asList("Hémoglobine A1C", "Microalbumine", "Taille", "Poids", "Fumeur", "Anormal",
-                "Cholestérol", "Vertige", "Rechute", "Réaction", "Anticorps");
 
-        String noteContent = note.getNote().toLowerCase(); // Convertir la note en minuscules pour une recherche insensible à la casse
-
-        for (String trigger : triggers) {
-            if (noteContent.contains(trigger.toLowerCase())) {
-                logger.info("Trigger found in medical note: {}", trigger);
-                return true;
-            }
-        }
-
-        logger.debug("noteContainsTriggers ends here, from ReportServiceImpl");
-
-        return false;
-    }
 
 
     private int calculateAge(Integer id) {
-        logger.debug("calculateAge starts here, from ReportServiceImpl");
+        logger.debug("calculateAge commence ici, depuis ReportServiceImpl");
 
+        // Récupère le patient pour le calcul de l'âge avec l'ID donné
         PatientEntity patient = patientService.patientById(id);
-        logger.info("Patient retrieved for age calculation with ID: {}", id);
+        logger.info("Patient récupéré pour le calcul de l'âge avec l'ID : {}", id);
 
         LocalDate birthDate = patient.getBirthDate();
+        // Calcule l'âge en années
         Period age = Period.between(birthDate, LocalDate.now());
         int patientAge = age.getYears();
 
-        logger.debug("calculateAge ends here, from ReportServiceImpl");
+        logger.debug("calculateAge se termine ici, depuis ReportServiceImpl");
 
+        // Retourne l'âge du patient
         return patientAge;
     }
 }
