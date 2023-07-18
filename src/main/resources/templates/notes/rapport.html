@@ -8,18 +8,26 @@
 </head>
 <body>
 <div th:fragment="collapse-raport">
-    <p>
-        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Generate Diabetes Report
-        </a>
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-            Button with data-bs-target
-        </button>
-    </p>
+
     <div class="collapse" id="collapseExample">
         <div class="card card-body">
             <h3 th:text = ${rapports.diabetesReport}></h3>
         </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">Diabetes Report</h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+            <strong>Id:</strong> <span th:text="${patients.id}"></span><br>
+            <strong>Patient Name:</strong> <span th:text="${patients.name} + ' ' + ${patients.lastName}"></span><br>
+            <strong>Age:</strong> <span th:text="${age}"></span><br>
+            <strong>Risk:</strong> <span th:text="${rapports.diabetesReport}"></span>
+        </p>
+        <a th:href="@{/patients/info/{id}(id=${patients.id})}" class="btn btn-primary">Return to Info</a>
     </div>
 </div>
 
