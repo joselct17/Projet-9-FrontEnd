@@ -1,6 +1,7 @@
-package com.OpenClassroom.FrontEnd.Controller.Configuration;
+package com.OpenClassroom.FrontEnd.Configuration;
 
 
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -18,6 +19,14 @@ public class SpringConfig {
         RestTemplate restTemplate = new RestTemplate();
 
         return restTemplate;
+    }
+
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("FrontEnd Application")
+                .packagesToScan("com.OpenClassroom.FrontEnd")
+                .build();
     }
 
 }
