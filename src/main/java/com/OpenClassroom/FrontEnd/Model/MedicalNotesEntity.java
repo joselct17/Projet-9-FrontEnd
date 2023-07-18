@@ -1,13 +1,13 @@
 package com.OpenClassroom.FrontEnd.Model;
 
-import lombok.Generated;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MedicalNotesEntity {
 
     @Generated
