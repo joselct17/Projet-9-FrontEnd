@@ -57,13 +57,13 @@
   <div class="pagination" style="">
     <ul class="pagination">
       <li class="page-item" th:if="${currentPage > 0}">
-        <a class="page-link" th:href="@{/patients?page=__${currentPage - 1}__&amp;size=10}">Previous</a>
+        <a class="page-link" th:href="@{/?page=__${currentPage - 1}__&amp;size=10}">Previous</a>
       </li>
       <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" th:class="${pageNumber == currentPage ? 'active' : ''}">
-        <a  class="page-link" th:href="@{/patients?page=__${pageNumber}__&amp;size=10}" th:text="${pageNumber + 1}"></a>
+        <a  class="page-link" th:href="@{/?page=__${pageNumber}__&amp;size=10}" th:text="${pageNumber + 1}"></a>
       </li>
       <li class="page-item" th:if="${currentPage < totalPages - 1}">
-        <a class="page-link" th:href="@{/patients?page=__${currentPage + 1}__&amp;size=10}">Next</a>
+        <a class="page-link" th:href="@{/?page=__${currentPage + 1}__&amp;size=10}">Next</a>
       </li>
     </ul>
   </div>

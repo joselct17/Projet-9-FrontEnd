@@ -48,26 +48,13 @@
             <div class="col">
                 <a class="btn btn-warning" th:href="@{/patients/update/{id}(id=${patients.id})}" >Edit</a>
                 <a class="btn btn-danger" th:href="@{/patients/delete/{id}(id=${patients.id})}">Delete</a>
-                <a class="btn btn-info" href="/patients">List</a>
+                <a class="btn btn-info" href="/">List</a>
                 <a class="btn btn-success" th:href="@{/patients/info/rapport/{patientId}(patientId=${patients.id})}">Report</a>
             </div>
 
         </div>
     </div>
 
-
-<!--    <div class="row">-->
-<!--        <h3>Patient Notes</h3>-->
-<!--        <form action="#" th:action="@{/notes/validate}" method="post" >-->
-<!--            <textarea class="form-control" rows="3"></textarea>-->
-<!--            <input class="btn btn-primary btn-sm" type="submit" value="Validate Note">-->
-<!--        </form>-->
-<!--        <div>-->
-<!--            <p th:each=" entry : ${patients.getMedicalNotes()}" th:value="${entry.getId}" th:text="${entry.getText()}"></p>-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    <div th:replace="~{notes/notes.html::noteForm}"></div>-->
 
     <div th:fragment="noteForm" class="container">
         <h3>Rajouter un commentaire</h3>
@@ -82,12 +69,16 @@
 
     <h4>Notes Médicales</h4>
     <ul th:each="note : ${notes}" class="list-group">
-        <li th:text="${note.note}" class="list-group-item"></li>
+        <li class="list-group-item" style="display: flex; justify-content: space-between;">
+            <span th:text="${note.note}"></span>
+            <span th:text="${note.dateTimeAtCreation}"></span>
+            <div>
+                <a class="btn btn-warning" th:href="@{/notes/update/{id}(id=${note.id})}">Edit</a>
+                <a class="btn btn-danger" th:href="@{/notes/delete/{id}(id=${note.id})}">Delete</a>
+            </div>
+        </li>
     </ul>
 
-
-
-<!--    //<div th:replace="~{notes/rapport.html::collapse-report}"></div>-->
 </div>
 </body>
 </html>
