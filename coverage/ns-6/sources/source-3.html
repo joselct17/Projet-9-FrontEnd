@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > ReportServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.OpenClassroom.FrontEnd.Service.Implementation</a>
+</div>
+
+<h1>Coverage Summary for Class: ReportServiceImpl (com.OpenClassroom.FrontEnd.Service.Implementation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReportServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.1%
+  </span>
+  <span class="absValue">
+    (44/72)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.OpenClassroom.FrontEnd.Service.Implementation;
+&nbsp;
+&nbsp;import com.OpenClassroom.FrontEnd.Model.MedicalNotesEntity;
+&nbsp;import com.OpenClassroom.FrontEnd.Model.PatientEntity;
+&nbsp;import com.OpenClassroom.FrontEnd.Model.ReportEntity;
+&nbsp;import com.OpenClassroom.FrontEnd.Service.Interface.IReportService;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.Period;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class ReportServiceImpl implements IReportService {</b>
+&nbsp;
+<b class="fc">&nbsp;    private Logger logger = LoggerFactory.getLogger(ReportServiceImpl.class);</b>
+&nbsp;    @Autowired
+&nbsp;    private NoteServiceImpl noteService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private PatientServiceImpl patientService;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ReportEntity getReportByPatientId(Integer patientId) {
+<b class="fc">&nbsp;        logger.debug(&quot;getReportByPatientId commence ici, depuis ReportServiceImpl&quot;);</b>
+&nbsp;
+&nbsp;        // Récupère les notes médicales pour l&#39;ID de patient donné
+<b class="fc">&nbsp;        List&lt;MedicalNotesEntity&gt; medicalNotes = noteService.getNotesByPatientId(patientId);</b>
+<b class="fc">&nbsp;        logger.info(&quot;Notes médicales récupérées pour le patient avec l&#39;ID : {}&quot;, patientId);</b>
+&nbsp;
+&nbsp;        // Compte le nombre de déclencheurs de notes dans les notes médicales
+&nbsp;
+<b class="fc">&nbsp;        MedicalNotesEntity[] medicalNoes = medicalNotes.toArray(new MedicalNotesEntity[0]);</b>
+&nbsp;        // Convertir la liste &#39;medicalNotes&#39; en un tableau &#39;MedicalNotesEntity[]&#39; et le stocker dans &#39;medicalNoes&#39;
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; notes = Arrays.stream(medicalNoes).map(MedicalNotesEntity::getNote).toList();</b>
+&nbsp;        // Utiliser un flux pour extraire les notes de chaque objet &#39;MedicalNotesEntity&#39; et créer une nouvelle liste &#39;notes&#39;
+&nbsp;
+<b class="fc">&nbsp;        Long termsTrigger = countTriggerWords(notes);</b>
+&nbsp;        // Appeler la méthode &#39;countTriggerWords&#39; avec la liste &#39;notes&#39; et stocker le nombre de déclencheurs de mots dans &#39;termsTrigger&#39;
+&nbsp;
+<b class="fc">&nbsp;        logger.info(&quot;Nombre de déclencheurs de notes trouvés : {}&quot;, termsTrigger);</b>
+&nbsp;        // Afficher un message d&#39;information indiquant le nombre de déclencheurs de mots trouvés
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;        // Récupère le sexe du patient
+<b class="fc">&nbsp;        String patientGender = patientService.patientById(patientId).getSex();</b>
+<b class="fc">&nbsp;        logger.info(&quot;Sexe récupéré pour le patient avec l&#39;ID : {}&quot;, patientId);</b>
+&nbsp;
+&nbsp;        // Calcule l&#39;âge du patient
+<b class="fc">&nbsp;        int patientAge = calculateAge(patientId);</b>
+<b class="fc">&nbsp;        logger.info(&quot;Âge calculé pour le patient avec l&#39;ID : {}&quot;, patientId);</b>
+&nbsp;
+&nbsp;        String riskLevel;
+&nbsp;
+&nbsp;        // Détermine le niveau de risque en fonction du nombre de déclencheurs de notes et de l&#39;âge du patient
+<b class="fc">&nbsp;        if (termsTrigger == 0) {</b>
+<b class="fc">&nbsp;            riskLevel = &quot;none&quot;;</b>
+<b class="fc">&nbsp;            logger.info(&quot;Aucun mot déclencheur trouvé. Niveau de risque : none&quot;);</b>
+<b class="fc">&nbsp;        } else if (termsTrigger == 2 &amp;&amp; patientAge &gt; 30) {</b>
+<b class="nc">&nbsp;            riskLevel = &quot;Borderline&quot;;</b>
+<b class="nc">&nbsp;            logger.info(&quot;2 mots déclencheurs trouvés et âge du patient &gt; 30 ans. Niveau de risque : Borderline&quot;);</b>
+<b class="fc">&nbsp;        } else if (patientAge &lt; 30) {</b>
+<b class="fc">&nbsp;            if (patientGender.equalsIgnoreCase(&quot;M&quot;) &amp;&amp; termsTrigger &gt;= 3) {</b>
+<b class="fc">&nbsp;                riskLevel = &quot;In Danger&quot;;</b>
+<b class="fc">&nbsp;                logger.info(&quot;3 mots déclencheurs trouvés, sexe masculin et âge du patient &lt; 30 ans. Niveau de risque : In Danger&quot;);</b>
+<b class="nc">&nbsp;            } else if (patientGender.equalsIgnoreCase(&quot;F&quot;) &amp;&amp; termsTrigger &gt;= 4) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;In Danger&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;4 mots déclencheurs trouvés, sexe féminin et âge du patient &lt; 30 ans. Niveau de risque : In Danger&quot;);</b>
+<b class="nc">&nbsp;            } else if (patientGender.equalsIgnoreCase(&quot;M&quot;) &amp;&amp; termsTrigger &gt;= 5) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;Early onset&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;5 mots déclencheurs trouvés, sexe masculin et âge du patient &lt; 30 ans. Niveau de risque : Early onset&quot;);</b>
+<b class="nc">&nbsp;            } else if (patientGender.equalsIgnoreCase(&quot;F&quot;) &amp;&amp; termsTrigger &gt;= 7) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;Early onset&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;7 mots déclencheurs trouvés, sexe féminin et âge du patient &lt; 30 ans. Niveau de risque : Early onset&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                riskLevel = &quot;none&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;Aucun niveau de risque déterminé pour le patient &lt; 30 ans. Niveau de risque : none&quot;);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (patientGender.equalsIgnoreCase(&quot;M&quot;) &amp;&amp; termsTrigger &gt;= 6) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;En danger&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;6 mots déclencheurs trouvés, sexe masculin et âge du patient &gt;= 30 ans. Niveau de risque : En danger&quot;);</b>
+<b class="nc">&nbsp;            } else if (patientGender.equalsIgnoreCase(&quot;F&quot;) &amp;&amp; termsTrigger &gt;= 6) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;En danger&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;6 mots déclencheurs trouvés, sexe féminin et âge du patient &gt;= 30 ans. Niveau de risque : En danger&quot;);</b>
+<b class="nc">&nbsp;            } else if (patientGender.equalsIgnoreCase(&quot;M&quot;) &amp;&amp; termsTrigger &gt;= 8) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;Early onset&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;8 mots déclencheurs trouvés, sexe masculin et âge du patient &gt;= 30 ans. Niveau de risque : Early onset&quot;);</b>
+<b class="nc">&nbsp;            } else if (patientGender.equalsIgnoreCase(&quot;F&quot;) &amp;&amp; termsTrigger &gt;= 8) {</b>
+<b class="nc">&nbsp;                riskLevel = &quot;Early onset&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;8 mots déclencheurs trouvés, sexe féminin et âge du patient &gt;= 30 ans. Niveau de risque : Early onset&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                riskLevel = &quot;Unknown&quot;;</b>
+<b class="nc">&nbsp;                logger.info(&quot;Niveau de risque inconnu pour le patient. Niveau de risque : Unknown&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;
+&nbsp;        // Récupère le nom du patient
+<b class="fc">&nbsp;        String patientName = patientService.patientById(patientId).getLastName();</b>
+<b class="fc">&nbsp;        logger.info(&quot;Nom du patient récupéré pour le patient avec l&#39;ID : {}&quot;, patientId);</b>
+&nbsp;
+<b class="fc">&nbsp;        logger.debug(&quot;getReportByPatientId se termine ici, depuis ReportServiceImpl&quot;);</b>
+&nbsp;
+&nbsp;        // Retourne une nouvelle entité de rapport avec l&#39;ID du patient, le nom du patient et le niveau de risque
+<b class="fc">&nbsp;        return new ReportEntity(patientId, patientName, riskLevel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ReportEntity getReportByPatLastName(String patientName) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public long countTriggerWords(List&lt;String&gt; comments) {
+&nbsp;        // Début de la méthode &#39;countTriggerWords&#39;. Message de débogage pour indiquer le début de l&#39;exécution.
+<b class="fc">&nbsp;        logger.debug(&quot;countTriggerWords commence ici, depuis ReportServiceImpl&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // Liste des mots déclencheurs à rechercher dans les commentaires.
+<b class="fc">&nbsp;        List&lt;String&gt; triggerWords = Arrays.asList(</b>
+&nbsp;                &quot;hémoglobine a1c&quot;, &quot;microalbumine&quot;, &quot;taille&quot;, &quot;poids&quot;, &quot;fumeur&quot;, &quot;anormal&quot;, &quot;cholestérol&quot;, &quot;vertige&quot;, &quot;rechute&quot;, &quot;réaction&quot;, &quot;anticorps&quot;, &quot;fume&quot;);
+&nbsp;
+<b class="fc">&nbsp;        long count = comments.stream()</b>
+&nbsp;                // Convertit tous les commentaires en minuscules pour une recherche insensible à la casse.
+<b class="fc">&nbsp;                .map(String::toLowerCase)</b>
+&nbsp;                // Applique un filtre pour rechercher les mots déclencheurs dans chaque commentaire.
+<b class="fc">&nbsp;                .flatMap(comment -&gt; triggerWords.stream().filter(comment::contains))</b>
+&nbsp;                // Supprime les doublons pour ne compter chaque mot déclencheur qu&#39;une seule fois.
+<b class="fc">&nbsp;                .distinct()</b>
+<b class="fc">&nbsp;                .peek(System.out::println)</b>
+&nbsp;                // Compte le nombre total de mots déclencheurs trouvés dans tous les commentaires.
+<b class="fc">&nbsp;                .count();</b>
+&nbsp;
+&nbsp;        // Affiche le nombre total de mots déclencheurs (facultatif).
+<b class="fc">&nbsp;        System.out.println(&quot;Le nombre des mots déclencheurs est: &quot; + count);</b>
+&nbsp;
+&nbsp;        // Message d&#39;information pour indiquer que la méthode &#39;countTriggerWords&#39; a été appelée avec succès et le nombre de mots déclencheurs calculé.
+<b class="fc">&nbsp;        logger.info(&quot;countTriggerWords a été appelée avec succès et a calculé le nombre de mots déclencheurs : {}, depuis ReportServiceImpl&quot;, count);</b>
+&nbsp;
+&nbsp;        // Retourne le nombre total de mots déclencheurs.
+<b class="fc">&nbsp;        return count;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    private int calculateAge(Integer id) {
+<b class="fc">&nbsp;        logger.debug(&quot;calculateAge commence ici, depuis ReportServiceImpl&quot;);</b>
+&nbsp;
+&nbsp;        // Récupère le patient pour le calcul de l&#39;âge avec l&#39;ID donné
+<b class="fc">&nbsp;        PatientEntity patient = patientService.patientById(id);</b>
+<b class="fc">&nbsp;        logger.info(&quot;Patient récupéré pour le calcul de l&#39;âge avec l&#39;ID : {}&quot;, id);</b>
+&nbsp;
+<b class="fc">&nbsp;        LocalDate birthDate = patient.getBirthDate();</b>
+&nbsp;        // Calcule l&#39;âge en années
+<b class="fc">&nbsp;        Period age = Period.between(birthDate, LocalDate.now());</b>
+<b class="fc">&nbsp;        int patientAge = age.getYears();</b>
+&nbsp;
+<b class="fc">&nbsp;        logger.debug(&quot;calculateAge se termine ici, depuis ReportServiceImpl&quot;);</b>
+&nbsp;
+&nbsp;        // Retourne l&#39;âge du patient
+<b class="fc">&nbsp;        return patientAge;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-07-19 13:24</div>
+</div>
+</body>
+</html>
