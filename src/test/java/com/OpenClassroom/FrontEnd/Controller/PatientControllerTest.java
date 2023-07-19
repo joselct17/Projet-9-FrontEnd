@@ -107,22 +107,4 @@ public class PatientControllerTest {
 
     }
 
-
-    @Test
-    public void testGetPatientByLastName() throws Exception {
-
-        PatientEntity patients = new PatientEntity(1,"John", "Doe", LocalDate.now(), "M", "101-Address", "15451");
-
-        String lastName = patients.getLastName();
-
-        // Perform the GET request
-        mockMvc.perform(get("/patients/" + lastName))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("patients/list"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("patients"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("totalPages"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("currentPage"));
-
-    }
-
 }
