@@ -68,16 +68,25 @@
     </div>
 
     <h4>Notes Médicales</h4>
-    <ul th:each="note : ${notes}" class="list-group">
-        <li class="list-group-item" style="display: flex; justify-content: space-between;">
-            <span th:text="${note.note}"></span>
-            <span th:text="${note.dateTimeAtCreation}"></span>
-            <div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Note</th>
+            <th>Date/Heure de création</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="note : ${notes}">
+            <td th:text="${note.note}"></td>
+            <td th:text="${note.dateTimeAtCreation}"></td>
+            <td>
                 <a class="btn btn-warning" th:href="@{/notes/update/{id}(id=${note.id})}">Edit</a>
                 <a class="btn btn-danger" th:href="@{/notes/delete/{id}(id=${note.id})}">Delete</a>
-            </div>
-        </li>
-    </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 </div>
 </body>
