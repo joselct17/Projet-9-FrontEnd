@@ -69,7 +69,7 @@ public class ReportServiceImpl implements IReportService {
             if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 3) {
                 riskLevel = "In Danger";
                 logger.info("3 mots déclencheurs trouvés, sexe masculin et âge du patient < 30 ans. Niveau de risque : In Danger");
-            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger >= 4) {
+            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger == 4) {
                 riskLevel = "In Danger";
                 logger.info("4 mots déclencheurs trouvés, sexe féminin et âge du patient < 30 ans. Niveau de risque : In Danger");
             } else if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 5) {
@@ -84,10 +84,10 @@ public class ReportServiceImpl implements IReportService {
             }
         } else {
             if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 6) {
-                riskLevel = "En danger";
+                riskLevel = "In danger";
                 logger.info("6 mots déclencheurs trouvés, sexe masculin et âge du patient >= 30 ans. Niveau de risque : En danger");
-            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger >= 6) {
-                riskLevel = "En danger";
+            } else if (patientGender.equalsIgnoreCase("F") && termsTrigger == 6) {
+                riskLevel = "In danger";
                 logger.info("6 mots déclencheurs trouvés, sexe féminin et âge du patient >= 30 ans. Niveau de risque : En danger");
             } else if (patientGender.equalsIgnoreCase("M") && termsTrigger >= 8) {
                 riskLevel = "Early onset";
@@ -96,8 +96,8 @@ public class ReportServiceImpl implements IReportService {
                 riskLevel = "Early onset";
                 logger.info("8 mots déclencheurs trouvés, sexe féminin et âge du patient >= 30 ans. Niveau de risque : Early onset");
             } else {
-                riskLevel = "Unknown";
-                logger.info("Niveau de risque inconnu pour le patient. Niveau de risque : Unknown");
+                riskLevel = "None";
+                logger.info("Aucun risque pour le patient. Niveau de risque : None");
             }
         }
 
@@ -125,7 +125,7 @@ public class ReportServiceImpl implements IReportService {
 
         // Liste des mots déclencheurs à rechercher dans les commentaires.
         List<String> triggerWords = Arrays.asList(
-                "hémoglobine a1c", "microalbumine", "taille", "poids", "fumeur", "anormal", "cholestérol", "vertige", "rechute", "réaction", "anticorps", "fume");
+                "hémoglobine a1c", "microalbumine", "taille", "poids", "fumeur", "anormal", "cholestérol", "vertige", "rechute", "réaction", "anticorps", "anormaux");
 
         long count = comments.stream()
                 // Convertit tous les commentaires en minuscules pour une recherche insensible à la casse.
